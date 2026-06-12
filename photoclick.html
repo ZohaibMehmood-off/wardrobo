@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bluewear camera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"DM Sans","Segoe UI",sans-serif}
+body{min-height:100vh;background:#eef5ff;color:#172033;display:flex;justify-content:center;align-items:center;padding:26px;transition:.25s}
+body.dark{background:#0f172a;color:#e5eefb}
+.panel{width:560px;max-width:100%;background:white;border:1px solid #e6eef8;border-radius:26px;box-shadow:0 22px 55px rgba(15,23,42,.12);padding:26px}
+body.dark .panel{background:#111c31;border-color:#2e3b52;box-shadow:0 22px 55px rgba(0,0,0,.28)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.top h1{font-size:24px;color:#0d6efd}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav a,.nav button{border:none;border-radius:12px;padding:9px 12px;background:#eef5ff;color:#0d6efd;text-decoration:none;font-weight:900;cursor:pointer}.themeBtn{background:#111827!important;color:white!important}body.dark .themeBtn{background:#f8fafc!important;color:#0f172a!important}
+video,canvas{width:100%;border-radius:18px;border:1.5px solid #dce7f5;background:#0f172a;display:block}canvas{display:none;margin-top:12px}body.dark video,body.dark canvas{border-color:#2e3b52}
+.buttons{display:flex;gap:10px;margin-top:16px}.buttons button{flex:1;border:none;border-radius:14px;padding:12px;color:white;font-weight:900;cursor:pointer;transition:.2s}.buttons button:hover{transform:translateY(-2px)}.start{background:#0d6efd}.stop{background:#dc2626}.capture{background:#16a34a}
+.status{min-height:22px;margin-top:16px;text-align:center;color:#64748b;font-weight:800}.ok{color:#16a34a}.err{color:#dc2626}.loading{color:#d97706}body.dark .status{color:#aab8cf}
+.results{display:grid;gap:10px;margin-top:14px}.item{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e6eef8;border-radius:15px;background:#f8fbff;padding:12px}body.dark .item{background:#0f172a;border-color:#2e3b52}.item strong{display:block;font-size:14px}.item span{font-size:12px;color:#64748b;font-weight:800}body.dark .item span{color:#aab8cf}.item button{border:none;border-radius:10px;background:#0d6efd;color:white;padding:8px 12px;font-weight:900;cursor:pointer}.item button.saved{background:#64748b}
+
+@media(max-width:600px){
+body{padding:12px;align-items:flex-start;overflow-x:hidden}
+.panel{padding:15px;border-radius:18px;width:100%}
+.top{align-items:flex-start;flex-direction:column;gap:10px;margin-bottom:12px}
+.top h1{font-size:21px}
+.nav{gap:6px}
+.nav a,.nav button{padding:8px 10px;font-size:12px;border-radius:10px}
+video,canvas{border-radius:14px;max-height:58vh;object-fit:cover}
+.buttons{gap:7px;margin-top:12px}
+.buttons button{padding:10px 6px;font-size:12px;border-radius:11px}
+.status{font-size:13px;margin-top:12px}
+.results{gap:8px}
+.item{padding:10px;border-radius:12px;align-items:flex-start}
+.item strong{font-size:13px}
+.item span{font-size:11px}
+.item button{padding:7px 9px;font-size:12px;border-radius:9px}
+}
+
+</style>
+</head>
+<body>
+<div class="panel">
+    <div class="top">
+        <h1>camera detect</h1>
+        <div class="nav"><a href="index.html">main</a><a href="dashboard.html">dashboard</a><button class="themeBtn" type="button">dark mode</button></div>
+    </div>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div class="buttons">
+        <button class="start" id="startBtn" type="button">start</button>
+        <button class="stop" id="stopBtn" type="button">stop</button>
+        <button class="capture" id="captureBtn" type="button">click photo</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="results" id="results"></div>
+</div>
+<script src="products.js"></script>
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const statusBox = document.getElementById("status");
+const results = document.getElementById("results");
+let stream = null;
+
+function setStatus(text, type) {
+    statusBox.className = "status " + (type || "");
+    statusBox.textContent = text;
+}
+
+async function startCamera() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        video.srcObject = stream;
+        setStatus("camera ready", "ok");
+    } catch (e) {
+        setStatus("camera permission denied", "err");
+    }
+}
+
+function stopCamera() {
+    if (!stream) return;
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+    video.srcObject = null;
+    setStatus("camera stopped", "");
+}
+
+function extractJson(text) {
+    const clean = String(text || "[]").replace(/```json|```/g, "").trim();
+    const start = clean.indexOf("[");
+    const end = clean.lastIndexOf("]");
+    if (start === -1 || end === -1) return [];
+    return JSON.parse(clean.slice(start, end + 1));
+}
+
+async function detect(image) {
+    setStatus("detecting clothes", "loading");
+    results.innerHTML = "";
+    const parts = image.split(",");
+    const base64 = parts[1];
+    const mime = parts[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+    const prompt = `look at this image and list every clothing item you see. return only a valid json array. each item must have name, category, and price. category must be shirts, pants, or accessories. no markdown.`;
+    try {
+        const res = await fetch("http://localhost:3001", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: "claude-sonnet-4-20250514",
+                max_tokens: 1000,
+                messages: [{
+                    role: "user",
+                    content: [
+                        { type: "image", source: { type: "base64", media_type: mime, data: base64 } },
+                        { type: "text", text: prompt }
+                    ]
+                }]
+            })
+        });
+        if (!res.ok) throw new Error("proxy or api error");
+        const data = await res.json();
+        const items = extractJson(data.content?.[0]?.text || "[]").map(item => ({
+            name: item.name || "detected cloth",
+            category: app.category(item.category || item.name),
+            price: Number(item.price) || 0
+        }));
+        if (!items.length) {
+            setStatus("no clothes detected", "err");
+            return;
+        }
+        setStatus(items.length + " item" + (items.length === 1 ? "" : "s") + " detected", "ok");
+        items.forEach(item => showItem(item, image));
+    } catch (e) {
+        setStatus("detection failed. run proxy.js and check api key", "err");
+    }
+}
+
+function showItem(item, image) {
+    const row = document.createElement("div");
+    row.className = "item";
+    row.innerHTML = `<div><strong></strong><span>${app.title(item.category)} · ${app.money(item.price)}</span></div><button type="button">save</button>`;
+    row.querySelector("strong").textContent = item.name;
+    row.querySelector("button").onclick = e => {
+        app.addProduct({ ...item, image });
+        e.target.textContent = "saved";
+        e.target.classList.add("saved");
+        e.target.disabled = true;
+    };
+    results.appendChild(row);
+}
+
+document.getElementById("startBtn").onclick = startCamera;
+document.getElementById("stopBtn").onclick = stopCamera;
+document.getElementById("captureBtn").onclick = () => {
+    if (!stream) return setStatus("start camera first", "err");
+    const ctx = canvas.getContext("2d");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.style.display = "block";
+    detect(canvas.toDataURL("image/jpeg", .85));
+};
+</script>
+</body>
+</html>

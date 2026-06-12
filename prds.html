@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bluewear products</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"DM Sans","Segoe UI",sans-serif}
+body{min-height:100vh;background:#f4f8ff;color:#172033;transition:.25s}
+body.dark{background:#0f172a;color:#e5eefb}
+.navbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid #e6eef8;display:flex;align-items:center;gap:12px;padding:14px 34px;box-shadow:0 12px 30px rgba(15,23,42,.05)}
+body.dark .navbar{background:rgba(15,23,42,.92);border-color:#2e3b52;box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.logo{margin-right:auto;color:#0d6efd;font-size:21px;font-weight:900;text-decoration:none}
+.navbar a,.navbar button{border:none;border-radius:12px;background:#eef5ff;color:#0d6efd;padding:10px 15px;font-size:13px;font-weight:900;cursor:pointer;text-decoration:none;transition:.2s;white-space:nowrap}
+.navbar a:hover,.navbar button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(13,110,253,.16)}
+.themeBtn{background:#111827!important;color:white!important}
+body.dark .themeBtn{background:#f8fafc!important;color:#0f172a!important}
+.searchInput{width:240px;border:1.5px solid #dce7f5;border-radius:24px;background:white;padding:10px 16px;color:#172033;font-weight:700;outline:none;transition:.2s}
+.searchInput:focus{width:290px;border-color:#0d6efd;box-shadow:0 0 0 4px rgba(13,110,253,.1)}
+body.dark .searchInput{background:#111c31;color:#e5eefb;border-color:#2e3b52}
+.filters{padding:24px 34px 0;display:flex;gap:10px;flex-wrap:wrap}
+.filter{border:1.5px solid #0d6efd;background:white;color:#0d6efd;padding:9px 17px;border-radius:999px;font-weight:900;cursor:pointer;transition:.2s;text-transform:lowercase}
+.filter:hover,.filter.active{background:#0d6efd;color:white;box-shadow:0 10px 22px rgba(13,110,253,.2)}
+body.dark .filter{background:#111c31;border-color:#2e72ff;color:#dbeafe}
+body.dark .filter.active,body.dark .filter:hover{background:#0d6efd;color:white}
+.container{padding:26px 34px 60px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+.top h1{font-size:27px;letter-spacing:-.6px}.top span{font-weight:800;color:#64748b}body.dark .top span{color:#aab8cf}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:20px}
+.card{position:relative;background:white;border:1px solid #e6eef8;border-radius:22px;overflow:hidden;box-shadow:0 18px 42px rgba(15,23,42,.06);transition:.25s}
+.card:hover{transform:translateY(-6px);box-shadow:0 22px 48px rgba(13,110,253,.16)}
+body.dark .card{background:#111c31;border-color:#2e3b52;box-shadow:0 18px 42px rgba(0,0,0,.22)}
+.card img{width:100%;height:210px;object-fit:cover;background:#e8eef7;display:block}
+.info{padding:15px;display:grid;gap:8px}.title{font-size:16px;font-weight:900;color:#172033}.price{font-size:18px;font-weight:900;color:#0d6efd}
+body.dark .title{color:#f8fafc}
+.tag{width:max-content;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900;text-transform:lowercase;letter-spacing:.5px}
+.actions{display:flex;gap:8px;padding:0 15px 15px}.actions button{flex:1;border:none;border-radius:12px;padding:9px 10px;font-weight:900;cursor:pointer}.edit{background:#facc15;color:#422006}.delete{background:#fee2e2;color:#dc2626}
+.empty{display:none;text-align:center;padding:50px;border:1.5px dashed #cbd7e8;border-radius:22px;color:#64748b;font-weight:800;background:rgba(255,255,255,.55)}
+body.dark .empty{border-color:#2e3b52;color:#aab8cf;background:#111c31}
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.58);backdrop-filter:blur(9px);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
+.form{width:430px;max-width:100%;background:white;border:1px solid #e6eef8;border-radius:24px;box-shadow:0 22px 55px rgba(15,23,42,.18);padding:28px}
+body.dark .form{background:#111c31;border-color:#2e3b52}
+.form h3{text-align:center;color:#0d6efd;font-size:22px;margin-bottom:20px}
+.group{margin-bottom:14px}.group input,.group select{width:100%;padding:13px 14px;border:1.5px solid #dce7f5;border-radius:13px;background:#f8fbff;color:#172033;font-weight:700;outline:none}body.dark .group input,body.dark .group select{background:#0f172a;color:#e5eefb;border-color:#2e3b52}
+.preview{height:150px;border:1.5px solid #dce7f5;border-radius:15px;background:#f8fbff;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#94a3b8;font-weight:700;margin:10px 0 16px}.preview img{width:100%;height:100%;object-fit:cover}body.dark .preview{background:#0f172a;border-color:#2e3b52}
+.upload{display:block;text-align:center;border:2px dashed #b8d0ff;border-radius:15px;padding:15px;color:#64748b;font-weight:800;cursor:pointer;background:#f8fbff}.upload input{display:none}body.dark .upload{background:#0f172a;border-color:#2e3b52;color:#aab8cf}
+.formBtns{display:flex;gap:10px}.formBtns button{flex:1;border:none;border-radius:13px;padding:12px 14px;font-weight:900;cursor:pointer}.save{background:#0d6efd;color:white}.cancel{background:#eef2f7;color:#64748b}body.dark .cancel{background:#243249;color:#dbeafe}
+@media(max-width:850px){.navbar{flex-wrap:wrap;padding:12px 18px}.searchInput,.searchInput:focus{order:5;width:100%}.filters,.container{padding-left:18px;padding-right:18px}.logo{width:100%}}
+
+@media(max-width:600px){
+body{overflow-x:hidden}
+.navbar{padding:10px 12px;gap:8px}
+.logo{width:auto!important;flex:1;font-size:18px;margin-right:0}
+.navbar a,.navbar button{padding:8px 10px;font-size:12px;border-radius:10px}
+.searchInput,.searchInput:focus{width:100%;height:38px;order:5;font-size:12px;padding:8px 12px}
+.filters{padding:14px 12px 0;gap:7px}
+.filter{padding:8px 12px;font-size:12px}
+.container{padding:16px 12px 48px}
+.top{align-items:flex-start;flex-direction:column;gap:5px;margin-bottom:12px}
+.top h1{font-size:22px}
+.top span{font-size:12px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{border-radius:16px}
+.card:hover{transform:none}
+.card img{height:118px}
+.info{padding:9px 10px;gap:5px}
+.title{font-size:13px;line-height:1.2}
+.price{font-size:14px}
+.tag{font-size:9px;padding:2px 7px}
+.actions{padding:0 9px 10px;gap:6px}
+.actions button{padding:7px 8px;font-size:11px;border-radius:9px}
+.empty{padding:25px 14px;font-size:13px;border-radius:16px}
+.overlay{padding:12px;align-items:flex-start;overflow:auto}
+.form{margin-top:12px;padding:18px;border-radius:18px}
+.form h3{font-size:19px;margin-bottom:14px}
+.group{margin-bottom:11px}
+.group input,.group select{padding:11px 12px;border-radius:11px;font-size:13px}
+.upload{padding:13px;font-size:13px}
+.preview{height:125px}
+.formBtns{gap:8px}
+.formBtns button{padding:10px 12px;font-size:13px}
+}
+@media(max-width:350px){
+.navbar a,.navbar button{padding:7px 8px;font-size:11px}
+.card img{height:106px}
+.info{padding:8px}
+.title{font-size:12px}
+}
+
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="logo" href="index.html">bluewear products</a>
+    <a href="dashboard.html">dashboard</a>
+    <a href="index.html#add">add cloth</a>
+    <input class="searchInput" id="search" type="text" placeholder="search products">
+    <button class="themeBtn" type="button">dark mode</button>
+</nav>
+<div class="filters">
+    <button class="filter active" data-cat="all">all</button>
+    <button class="filter" data-cat="shirts">shirts</button>
+    <button class="filter" data-cat="pants">pants</button>
+    <button class="filter" data-cat="accessories">accessories</button>
+</div>
+<main class="container">
+    <div class="top"><h1>products</h1><span id="countText">0 items</span></div>
+    <div class="empty" id="emptyBox">no products found.</div>
+    <div class="grid" id="grid"></div>
+</main>
+<div class="overlay" id="overlay">
+    <div class="form">
+        <h3>edit product</h3>
+        <form id="form">
+            <div class="group"><input id="name" type="text" placeholder="cloth name" required></div>
+            <div class="group"><select id="category" required><option value="shirts">shirts</option><option value="pants">pants</option><option value="accessories">accessories</option></select></div>
+            <div class="group"><input id="price" type="number" min="0" step="1" placeholder="price" required></div>
+            <label class="upload"><span id="uploadText">change photo</span><input type="file" id="imageInput" accept="image/*"></label>
+            <div class="preview" id="preview">no image</div>
+            <div class="formBtns"><button class="save" type="submit">save</button><button class="cancel" id="cancel" type="button">cancel</button></div>
+        </form>
+    </div>
+</div>
+<script src="products.js"></script>
+<script>
+const grid = document.getElementById("grid");
+const search = document.getElementById("search");
+const emptyBox = document.getElementById("emptyBox");
+const overlay = document.getElementById("overlay");
+const form = document.getElementById("form");
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+let active = "all";
+let editId = null;
+let oldImage = "";
+
+function showProducts() {
+    const text = search.value.trim().toLowerCase();
+    const list = app.products().filter(item => {
+        const catOk = active === "all" || item.category === active;
+        const textOk = item.name.toLowerCase().includes(text) || item.category.includes(text);
+        return catOk && textOk;
+    });
+    grid.innerHTML = "";
+    emptyBox.style.display = list.length ? "none" : "block";
+    document.getElementById("countText").textContent = list.length + " item" + (list.length === 1 ? "" : "s");
+    list.forEach(item => grid.appendChild(makeCard(item)));
+    app.updateCounters();
+}
+
+function makeCard(item) {
+    const col = app.color(item.category);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `<img src="${item.image || "https://via.placeholder.com/400x300?text=no+image"}" alt="${item.name}">
+        <div class="info"><h3 class="title"></h3><span class="tag" style="background:${col.bg};color:${col.color}">${app.title(item.category)}</span><div class="price">${app.money(item.price)}</div></div>
+        <div class="actions"><button class="edit" type="button">edit</button><button class="delete" type="button">delete</button></div>`;
+    card.querySelector(".title").textContent = item.name;
+    card.querySelector(".edit").onclick = () => openEdit(item);
+    card.querySelector(".delete").onclick = () => {
+        app.deleteProduct(item.id);
+        showProducts();
+    };
+    return card;
+}
+
+function openEdit(item) {
+    editId = item.id;
+    oldImage = item.image;
+    document.getElementById("name").value = item.name;
+    document.getElementById("category").value = item.category;
+    document.getElementById("price").value = item.price;
+    preview.innerHTML = item.image ? `<img src="${item.image}" alt="preview">` : "no image";
+    document.getElementById("uploadText").textContent = "change photo";
+    overlay.style.display = "flex";
+}
+
+function closeEdit() {
+    overlay.style.display = "none";
+    form.reset();
+    preview.innerHTML = "no image";
+    editId = null;
+    oldImage = "";
+}
+
+imageInput.onchange = () => {
+    const file = imageInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        oldImage = e.target.result;
+        preview.innerHTML = `<img src="${oldImage}" alt="preview">`;
+        document.getElementById("uploadText").textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+};
+
+form.onsubmit = e => {
+    e.preventDefault();
+    app.editProduct(editId, {
+        name: document.getElementById("name").value,
+        category: document.getElementById("category").value,
+        price: document.getElementById("price").value,
+        image: oldImage
+    });
+    closeEdit();
+    showProducts();
+};
+
+document.querySelectorAll(".filter").forEach(btn => {
+    btn.onclick = () => {
+        active = btn.dataset.cat;
+        document.querySelectorAll(".filter").forEach(item => item.classList.remove("active"));
+        btn.classList.add("active");
+        showProducts();
+    };
+});
+
+document.getElementById("cancel").onclick = closeEdit;
+search.oninput = showProducts;
+window.onload = showProducts;
+</script>
+</body>
+</html>

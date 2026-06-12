@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bluewear qr</title>
+<script src="html5-qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"DM Sans","Segoe UI",sans-serif}
+body{min-height:100vh;background:#eef5ff;color:#172033;padding:26px;transition:.25s}body.dark{background:#0f172a;color:#e5eefb}
+.top{max-width:1050px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center;gap:10px}.top h1{color:#0d6efd}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav a,.nav button{border:none;border-radius:12px;padding:10px 14px;background:white;color:#0d6efd;text-decoration:none;font-weight:900;cursor:pointer}.themeBtn{background:#111827!important;color:white!important}body.dark .themeBtn{background:#f8fafc!important;color:#0f172a!important}body.dark .nav a{background:#111c31;color:#dbeafe}
+.wrap{max-width:1050px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px}.box{background:white;border:1px solid #e6eef8;border-radius:24px;box-shadow:0 20px 50px rgba(15,23,42,.1);padding:22px}body.dark .box{background:#111c31;border-color:#2e3b52;box-shadow:0 20px 50px rgba(0,0,0,.25)}.box h2{font-size:18px;margin-bottom:14px;color:#0d6efd}#reader{overflow:hidden;border-radius:16px;border:2px solid #0d6efd}.result{min-height:210px;border-radius:16px;background:#0f172a;color:white;padding:20px;display:flex;align-items:center;justify-content:center;text-align:center;word-break:break-word;font-weight:800;line-height:1.5}
+@media(max-width:800px){.wrap{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+
+@media(max-width:600px){
+body{padding:12px;overflow-x:hidden}
+.top{gap:10px;margin-bottom:12px}
+.top h1{font-size:22px}
+.nav{gap:6px}
+.nav a,.nav button{padding:8px 10px;font-size:12px;border-radius:10px}
+.wrap{gap:12px}
+.box{padding:14px;border-radius:18px}
+.box h2{font-size:16px;margin-bottom:10px}
+#reader{border-radius:12px;max-width:100%}
+.result{min-height:120px;padding:14px;font-size:13px;border-radius:12px}
+}
+
+</style>
+</head>
+<body>
+<div class="top"><h1>qr scanner</h1><div class="nav"><a href="index.html">main</a><a href="dashboard.html">dashboard</a><button class="themeBtn" type="button">dark mode</button></div></div>
+<div class="wrap">
+    <div class="box"><h2>scan qr</h2><div id="reader"></div></div>
+    <div class="box"><h2>result</h2><div id="result" class="result">result here</div></div>
+</div>
+<script src="products.js"></script>
+<script>
+const result = document.getElementById("result");
+function onScanSuccess(text) {
+    result.textContent = text;
+}
+function onScanError() {}
+result.onclick = () => {
+    const text = result.textContent.trim();
+    if (text.startsWith("http://") || text.startsWith("https://")) window.open(text, "_blank");
+};
+const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+scanner.render(onScanSuccess, onScanError);
+</script>
+</body>
+</html>

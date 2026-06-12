@@ -1,0 +1,19 @@
+bluewear project run steps
+
+1. open terminal in this folder
+
+2. start the api proxy only when you want camera detection
+
+export ANTHROPIC_API_KEY="paste_your_key_here"
+node proxy.js
+
+3. open another terminal in same folder
+
+python3 -m http.server 5500
+
+4. open this link
+
+http://localhost:5500/index.html
+
+normal add cloth, product filters, dashboard, favorites, qr, and dark mode work with localstorage.
+camera detection needs proxy.js running.
